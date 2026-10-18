@@ -66,11 +66,11 @@ def test_server_error_keeps_status():
     error = ServerError("HTTP 503", status=503)
 
     assert error.status == 503
-    assert isinstance(error, BibleQLError)
+    assert isinstance(error, APIError)
 
 
 def test_rate_limit_error_caught_as_api_error():
-    with pytest.raises(RateLimitError) as exc_info:
+    with pytest.raises(APIError) as exc_info:
         raise RateLimitError("HTTP 429", status=429)
 
     assert exc_info.value.status == 429
