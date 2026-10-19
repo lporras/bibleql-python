@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_call: # lets release.yml run the full CI before publishing
 
 # Cancel an in-progress run when a newer commit is pushed to the same branch/PR.
 concurrency:

@@ -231,6 +231,16 @@ python scripts/smoke_test.py      # calls every method and prints the results
 
 The library itself never reads `.env` files. In your own app, load them yourself (for example with `dotenv.load_dotenv()`) before creating a `Client()`.
 
+### Releasing
+
+Releases are published to PyPI by GitHub Actions ([`release.yml`](.github/workflows/release.yml)) using [Trusted Publishing](https://docs.pypi.org/trusted-publishers/), so no API tokens are involved:
+
+1. Bump `src/bibleql/_version.py` and add a `## [x.y.z] - YYYY-MM-DD` section to `CHANGELOG.md`.
+2. Commit and push to `main`, then wait for CI to pass.
+3. Tag and push: `git tag -a vx.y.z -m "bibleql x.y.z" && git push origin vx.y.z`
+
+The workflow runs CI, checks that the tag matches the version and that the CHANGELOG has an entry, builds the package, publishes it to PyPI, and creates a GitHub Release with the CHANGELOG section as its notes.
+
 ## License
 
 Released under the [MIT License](LICENSE).
