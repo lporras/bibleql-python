@@ -239,7 +239,7 @@ Releases are published to PyPI by GitHub Actions ([`release.yml`](.github/workfl
 2. Commit and push to `main`, then wait for CI to pass.
 3. Tag and push: `git tag -a vx.y.z -m "bibleql x.y.z" && git push origin vx.y.z`
 
-The workflow runs CI, checks that the tag matches the version and that the CHANGELOG has an entry, builds the package, publishes it to PyPI, and creates a GitHub Release with the CHANGELOG section as its notes.
+The workflow runs CI, checks that the tag matches the version and that the CHANGELOG has an entry, builds the package, publishes it to TestPyPI and then PyPI, and creates a GitHub Release with the CHANGELOG section as its notes.
 
 ## License
 

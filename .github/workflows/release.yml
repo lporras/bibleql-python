@@ -48,9 +48,29 @@ jobs:
           name: dist
           path: dist/
 
+  # Rehearsal: if uploading to TestPyPI fails, the real PyPI is never touched.
+  publish-testpypi:
+    name: Publish to TestPyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/project/bibleql/${{ github.ref_name }}
+    permissions:
+      id-token: write # required for Trusted Publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true # re-running a release shouldn't fail on TestPyPI
+
   publish-pypi:
     name: Publish to PyPI
-    needs: build
+    needs: publish-testpypi
     runs-on: ubuntu-latest
     environment:
       name: pypi
