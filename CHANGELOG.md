@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## [0.1.0]
+## [0.1.0] - 2026-10-18
 
 - Initial release.
 - `Client` with API key from argument or `BIBLEQL_API_KEY`, configurable default translation, API URL and timeout; usable as a context manager.
