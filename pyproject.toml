@@ -28,18 +28,33 @@ dev = [
     "pytest>=8",
     "respx>=0.22",
     "ruff>=0.6",
+    "graphql-core>=3.2",
+    "python-dotenv>=1.0",
     "build",
     "twine",
 ]
 
 [project.urls]
-Homepage = "https://github.com/lporras/bibleql-python"
+Homepage = "https://bibleql.org"
+Documentation = "https://docs.bibleql.org"
 Source = "https://github.com/lporras/bibleql-python"
 Changelog = "https://github.com/lporras/bibleql-python/blob/main/CHANGELOG.md"
 
-# Read the version from __version__ in __init__.py (like version.rb)
+# Read the version from __version__ in _version.py (like version.rb)
 [tool.hatch.version]
-path = "src/bibleql/__init__.py"
+path = "src/bibleql/_version.py"
+
+# Allowlist for the source archive (.tar.gz), so local files such as .env or
+# editor/agent settings can never be published, whatever is in .gitignore.
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/bibleql",
+    "tests",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "pyproject.toml",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

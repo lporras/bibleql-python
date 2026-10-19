@@ -3,7 +3,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Any
+
+
+class Testament(str, Enum):
+    """Testament filter for concordance queries.
+
+    Note: ``random_verse`` takes the plain strings ``"OT"``/``"NT"`` instead,
+    because that is what the API's ``randomVerse`` field expects.
+    """
+
+    OLD = "OLD"
+    NEW = "NEW"
 
 
 @dataclass(frozen=True)
@@ -163,4 +175,135 @@ class SemanticSearchResult:
         return cls(
             verse=Verse.from_api(data["verse"]),
             similarity=data["similarity"],
+        )
+
+
+# --- Concordance -----------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class BookCount:
+    """How many verses in one book contain a concordance word."""
+
+    book_id: str
+    book_name: str
+    count: int
+
+    @classmethod
+    def from_api(cls, data: dict[str, Any]) -> BookCount:
+        return cls(book_id=data["bookId"], book_name=data["bookName"], count=data["count"])
+
+
+@dataclass(frozen=True)
+class TestamentCount:
+    """How many verses in each testament contain a concordance word."""
+
+    old: int
+    new: int
+
+    @classmethod
+    def from_api(cls, data: dict[str, Any]) -> TestamentCount:
+        return cls(old=data["old"], new=data["new"])
+
+
+@dataclass(frozen=True)
+class ConcordanceEntry:
+    """Aggregate statistics for a word across the whole translation."""
+
+    lemma: str
+    surface_forms: list[str]
+    total_occurrences: int
+    verse_count: int
+    occurrences_by_book: list[BookCount]
+    occurrences_by_testament: TestamentCount
+
+    @classmethod
+    def from_api(cls, data: dict[str, Any]) -> ConcordanceEntry:
+        return cls(
+            lemma=data["lemma"],
+            surface_forms=list(data["surfaceForms"]),
+            total_occurrences=data["totalOccurrences"],
+            verse_count=data["verseCount"],
+            occurrences_by_book=[BookCount.from_api(b) for b in data["occurrencesByBook"]],
+            occurrences_by_testament=TestamentCount.from_api(data["occurrencesByTestament"]),
+        )
+
+
+@dataclass(frozen=True)
+class StrongsEntry:
+    """A Strong's concordance number (e.g. H2617, G26)."""
+
+    number: str
+
+    @classmethod
+    def from_api(cls, data: dict[str, Any]) -> StrongsEntry:
+        return cls(number=data["number"])
+
+
+@dataclass(frozen=True)
+class ConcordanceOccurrence:
+    """One verse containing the word.
+
+    ``context`` is a keyword-in-context snippet with ``<mark>`` tags around the
+    match; sanitize it before rendering as HTML. ``cursor`` can be passed as
+    ``after=`` to resume pagination right after this occurrence.
+    """
+
+    verse: Verse
+    context: str
+    cursor: str
+    strongs: StrongsEntry | None = None
+
+    @classmethod
+    def from_api(cls, edge: dict[str, Any]) -> ConcordanceOccurrence:
+        node = edge["node"]
+        strongs = node.get("strongs")
+        return cls(
+            verse=Verse.from_api(node["verse"]),
+            context=node["context"],
+            cursor=edge["cursor"],
+            strongs=StrongsEntry.from_api(strongs) if strongs else None,
+        )
+
+
+@dataclass(frozen=True)
+class ConcordancePage:
+    """One page of concordance results.
+
+    The GraphQL connection (``edges``/``node``/``pageInfo``) is flattened into
+    ``occurrences``, ``has_next_page`` and ``end_cursor``.
+    """
+
+    entry: ConcordanceEntry
+    total_count: int
+    occurrences: list[ConcordanceOccurrence]
+    has_next_page: bool
+    end_cursor: str | None = None
+
+    @classmethod
+    def from_api(cls, data: dict[str, Any]) -> ConcordancePage:
+        page_info = data["pageInfo"]
+        return cls(
+            entry=ConcordanceEntry.from_api(data["entry"]),
+            total_count=data["totalCount"],
+            occurrences=[ConcordanceOccurrence.from_api(edge) for edge in data["edges"]],
+            has_next_page=page_info["hasNextPage"],
+            end_cursor=page_info.get("endCursor"),
+        )
+
+
+@dataclass(frozen=True)
+class ConcordanceIndexEntry:
+    """A word in the alphabetical concordance index."""
+
+    lemma: str
+    verse_count: int
+    total_occurrences: int
+
+    @classmethod
+    def from_api(cls, data: dict[str, Any]) -> ConcordanceIndexEntry:
+        return cls(
+            lemma=data["lemma"],
+            verse_count=data["verseCount"],
+            total_occurrences=data["totalOccurrences"],
         )
