@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-19
+
+- Automated releases to PyPI via GitHub Actions Trusted Publishing.
+
 ## [0.1.0] - 2026-10-18
 
 - Initial release.
