@@ -1,5 +1,9 @@
 # BibleQL Python
 
+[![CI](https://github.com/lporras/bibleql-python/actions/workflows/ci.yml/badge.svg)](https://github.com/lporras/bibleql-python/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/bibleql.svg)](https://pypi.org/project/bibleql/)
+[![Python versions](https://img.shields.io/pypi/pyversions/bibleql.svg)](https://pypi.org/project/bibleql/)
+
 A typed Python client for the [BibleQL](https://bibleql.org) GraphQL API. Query Bible verses, passages, translations, search and concordance across 47 translations in 31 languages, without writing GraphQL.
 
 ## Installation
